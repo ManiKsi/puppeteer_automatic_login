@@ -14,15 +14,13 @@ const DATES_TO_EXCLUDE = {
 };
 
 const hrPunch = async (res) => {
-  let browser = null
+  let browser = null;
   try {
     main();
   } catch (e) {
     console.error(e);
     res.send(`Something went wrong while running Puppeteer: ${e}`);
-  } finally {
-    await browser.close();
-  }
+  } 
 };
 
 async function markAttendance() {
@@ -42,7 +40,7 @@ async function markAttendance() {
       return;
     }
     // Launch a new browser instance
-     browser = await puppeteer.launch({
+    browser = await puppeteer.launch({
       args: [
         "--disable-setuid-sandbox",
         "--no-sandbox",
@@ -171,11 +169,14 @@ async function markAttendance() {
     console.log("Attendance marked successfully.");
 
     // Close the browser
-    await browser.close();
-    console.log("Browser closed.");
-  } catch (error) {
-    console.error("An error occurred:", error);
-    throw error;
+  } catch (e) {
+    console.error(e);
+    res.send(`Something went wrong while running Puppeteer: ${e}`);
+  } finally {
+    if (browser !== null) {
+      await browser.close();
+      console.log("Browser closed.");
+    }
   }
 }
 
