@@ -106,7 +106,7 @@ async function markAttendance() {
 
     console.log("Waiting for the button to appear in the DOM...");
     await page.waitForXPath("//button[contains(., 'MARK ATTENDANCE')]", {
-      timeout: 120000,
+      timeout: 240000,
     });
     console.log("Button appeared in the DOM.");
 
@@ -130,12 +130,12 @@ async function markAttendance() {
     await page.type('textarea[name="webCheckinRemarkName"]', "Punch");
     console.log("Remarks entered.");
 
-    
+
     // Wait for the final mark button to appear
     console.log("Waiting for the final mark button to appear in the DOM...");
     await page.waitForXPath(
       "//button/span[contains(normalize-space(), 'Mark attendance')]",
-      { timeout: 120000 }
+      { timeout: 240000 }
     );
     console.log("final mark Button appeared in the DOM.");
 
