@@ -130,29 +130,31 @@ async function markAttendance() {
     await page.type('textarea[name="webCheckinRemarkName"]', "Punch");
     console.log("Remarks entered.");
 
-    // Waiting for the "MARK ATTENDANCE" button to appear
-    await page.waitForFunction(
-      (text) => {
-        const buttons = Array.from(document.querySelectorAll("button"));
-        const targetButton = buttons.find(
-          (button) => button.textContent.trim() === text
-        );
-        return targetButton !== undefined;
-      },
-      {},
-      "Mark attendance"
+    
+    // Wait for the final mark button to appear
+    console.log("Waiting for the final mark button to appear in the DOM...");
+    await page.waitForXPath(
+      "//button/span[contains(normalize-space(), 'Mark attendance')]",
+      { timeout: 120000 }
     );
-    console.log("Mark Attendance button visible.");
+    console.log("final mark Button appeared in the DOM.");
 
-    // Click "MARK ATTENDANCE" again
-    await page.evaluate((text) => {
-      const buttons = Array.from(document.querySelectorAll("button"));
-      const targetButton = buttons.find(
-        (button) => button.textContent.trim() === text
+    console.log("Selecting the button...");
+    const [finalMarkButton] = await page.$x(
+      "//button/span[contains(normalize-space(), 'Mark attendance')]/.."
+    );
+    if (finalMarkButton) {
+      const finalMarkButtonHTML = await page.evaluate(
+        (el) => el.outerHTML,
+        finalMarkButton
       );
-      targetButton.click();
-    }, "Mark attendance");
-    console.log("Mark Attendance button clicked again.");
+      console.log("Button HTML:", finalMarkButtonHTML);
+      console.log("Button selected, clicking the button...");
+      await page.evaluate((finalMarkButton) => finalMarkButton.click(), finalMarkButton);
+      console.log("Button clicked.");
+    } else {
+      console.log("Could not find the button.");
+    }
 
     // Wait for the attendance to be marked
     // Wait for the remarks textarea to disappear
