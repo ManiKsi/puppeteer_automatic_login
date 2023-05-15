@@ -19,7 +19,7 @@ const hrPunch = async (res) => {
   } catch (e) {
     console.error(e);
     res.send(`Something went wrong while running Puppeteer: ${e}`);
-  } 
+  }
 };
 
 async function markAttendance() {
@@ -104,28 +104,23 @@ async function markAttendance() {
     }, "LOG IN");
     console.log("Login button clicked.");
 
-    // Waiting for the "MARK ATTENDANCE" button to appear
-    await page.waitForFunction(
-      (text) => {
-        const buttons = Array.from(document.querySelectorAll("button"));
-        const targetButton = buttons.find(
-          (button) => button.textContent.trim() === text
-        );
-        return targetButton !== undefined;
-      },
-      {},
-      "MARK ATTENDANCE"
-    );
-    console.log("Mark Attendance button visible.");
-    // Click the "MARK ATTENDANCE" button
-    await page.evaluate((text) => {
-      const buttons = Array.from(document.querySelectorAll("button"));
-      const targetButton = buttons.find(
-        (button) => button.textContent.trim() === text
-      );
-      targetButton.click();
-    }, "MARK ATTENDANCE");
-    console.log("Mark Attendance button clicked.");
+    console.log("Waiting for the button to appear in the DOM...");
+    await page.waitForXPath("//button[contains(., 'MARK ATTENDANCE')]", {
+      timeout: 120000,
+    });
+    console.log("Button appeared in the DOM.");
+
+    console.log("Selecting the button...");
+    const [button] = await page.$x("//button[contains(., 'MARK ATTENDANCE')]");
+    if (button) {
+      const buttonHTML = await page.evaluate((el) => el.outerHTML, button);
+      console.log("Button HTML:", buttonHTML);
+      console.log("Button selected, clicking the button...");
+      await page.evaluate((button) => button.click(), button);
+      console.log("Button clicked.");
+    } else {
+      console.log("Could not find the button.");
+    }
 
     // Wait for the remarks textarea to appear and enter remarks
     await page.waitForSelector('textarea[name="webCheckinRemarkName"]', {
