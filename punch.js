@@ -14,6 +14,7 @@ const DATES_TO_EXCLUDE = {
 };
 
 const hrPunch = async (res) => {
+  let browser = null
   try {
     main();
   } catch (e) {
@@ -41,7 +42,7 @@ async function markAttendance() {
       return;
     }
     // Launch a new browser instance
-    const browser = await puppeteer.launch({
+     browser = await puppeteer.launch({
       args: [
         "--disable-setuid-sandbox",
         "--no-sandbox",
