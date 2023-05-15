@@ -14,7 +14,6 @@ const DATES_TO_EXCLUDE = {
 };
 
 const hrPunch = async (res) => {
-  let browser = null;
   try {
     main();
   } catch (e) {
@@ -24,6 +23,7 @@ const hrPunch = async (res) => {
 };
 
 async function markAttendance() {
+  let browser = null;
   try {
     // Get the current date in India
     const now = new Date();
