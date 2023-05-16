@@ -41,6 +41,7 @@ async function markAttendance() {
     }
     // Launch a new browser instance
     browser = await puppeteer.launch({
+      headless: false,
       args: [
         "--disable-setuid-sandbox",
         "--no-sandbox",
@@ -128,10 +129,11 @@ async function markAttendance() {
     await page.waitForSelector('textarea[name="webCheckinRemarkName"]', {
       timeout: 240000,
     });
+    
     console.log("Remarks textarea visible.");
     await page.type('textarea[name="webCheckinRemarkName"]', "Punch");
     console.log("Remarks entered.");
-
+    await page.waitForTimeout(100000);
 
     // Wait for the final mark button to appear
     console.log("Waiting for the final mark button to appear in the DOM...");
@@ -139,6 +141,7 @@ async function markAttendance() {
       "//button/span[contains(normalize-space(), 'Mark attendance')]",
       { timeout: 240000 }
     );
+  
     console.log("final mark Button appeared in the DOM.");
 
     console.log("Selecting the button...");
@@ -152,7 +155,10 @@ async function markAttendance() {
       );
       console.log("Button HTML:", finalMarkButtonHTML);
       console.log("Button selected, clicking the button...");
-      await page.evaluate((finalMarkButton) => finalMarkButton.click(), finalMarkButton);
+      await page.evaluate(() => {
+        let button = document.querySelector('.btn.btn-success.btn-h-40.btn-block.ladda-button');
+        button.click();
+      });
       console.log("Button clicked.");
     } else {
       console.log("Could not find the button.");
@@ -160,6 +166,7 @@ async function markAttendance() {
 
     // Wait for the attendance to be marked
     // Wait for the remarks textarea to disappear
+    await page.waitForTimeout(100000);
     await page.waitForSelector('textarea[name="webCheckinRemarkName"]', {
       hidden: true,
       timeout: 240000,
