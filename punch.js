@@ -63,7 +63,8 @@ async function markAttendance() {
     console.log("Website opened successfully.");
 
     // Wait for the page to load
-    await page.waitForSelector('input[id="hrone-username"]', { visible: true });
+    await page.waitForSelector('input[id="hrone-username"]', { visible: true },
+    { timeout: 240000 });
     console.log("Page loaded.");
 
     // Enter phone number and click "Next"
@@ -73,7 +74,8 @@ async function markAttendance() {
     console.log("Next button clicked.");
 
     // Wait for the password input to become visible
-    await page.waitForSelector('input[id="hrone-password"]', { visible: true });
+    await page.waitForSelector('input[id="hrone-password"]', { visible: true },
+    { timeout: 240000 });
     console.log("Password input visible.");
 
     // Enter password
@@ -124,7 +126,7 @@ async function markAttendance() {
 
     // Wait for the remarks textarea to appear and enter remarks
     await page.waitForSelector('textarea[name="webCheckinRemarkName"]', {
-      timeout: 120000,
+      timeout: 240000,
     });
     console.log("Remarks textarea visible.");
     await page.type('textarea[name="webCheckinRemarkName"]', "Punch");
@@ -160,7 +162,7 @@ async function markAttendance() {
     // Wait for the remarks textarea to disappear
     await page.waitForSelector('textarea[name="webCheckinRemarkName"]', {
       hidden: true,
-      timeout: 120000,
+      timeout: 240000,
     });
     console.log("Remarks textarea disappeared.");
     console.log("Attendance marked successfully.");
