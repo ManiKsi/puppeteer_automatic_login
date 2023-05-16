@@ -41,7 +41,6 @@ async function markAttendance() {
     }
     // Launch a new browser instance
     browser = await puppeteer.launch({
-      headless: false,
       args: [
         "--disable-setuid-sandbox",
         "--no-sandbox",
