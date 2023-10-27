@@ -92,7 +92,7 @@ async function markAttendance() {
     console.log("Password input visible.");
 
     // Enter password
-    await page.type('input[id="hrone-password"]', "Athen@143");
+    await page.type('input[id="hrone-password"]', "*****");
     console.log("Password entered.");
 
     // Wait for the login button to appear
