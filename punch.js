@@ -5,12 +5,18 @@ require("dotenv").config();
 const DATES_MAY = [20, 21];
 const DATES_JUNE = [10, 11, 17, 18, 25];
 const DATES_JULY = [2, 8, 9, 15, 16, 23, 29, 30];
+const DATES_OCTOBER = [29,];
+const DATES_NOVEMBER = [5, 11,12,18, 19, 26,27];
+const DATES_DECEMBER = [3, 9, 10, 16, 17, 24, 31];
 
 // Define a mapping from months to dates to exclude
 const DATES_TO_EXCLUDE = {
   5: DATES_MAY,
   6: DATES_JUNE,
   7: DATES_JULY,
+  10: DATES_OCTOBER,
+  11: DATES_NOVEMBER,
+  12: DATES_DECEMBER,
 };
 
 const hrPunch = async (res) => {
@@ -32,7 +38,11 @@ async function markAttendance() {
       year: "numeric",
       month: "numeric",
       day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
     }).format(now);
+    console.log("Current date and time in India:", indiaTime ,"----------------------------------->");
+    
     const [month, date, year] = indiaTime.split("/").map(Number);
     // If the date is one of the dates to exclude, stop the function
     if (DATES_TO_EXCLUDE[month].includes(date)) {
@@ -40,7 +50,9 @@ async function markAttendance() {
       return;
     }
     // Launch a new browser instance
+    console.log("Launching browser...")
     browser = await puppeteer.launch({
+      headless: true,
       args: [
         "--disable-setuid-sandbox",
         "--no-sandbox",
@@ -48,9 +60,7 @@ async function markAttendance() {
         "--no-zygote",
       ],
       executablePath:
-        process.env.NODE_ENV === "production"
-          ? process.env.PUPPETEER_EXECUTABLE_PATH
-          : puppeteer.executablePath(),
+        puppeteer.executablePath(),
     });
     console.log("Browser launched.");
 
@@ -66,11 +76,14 @@ async function markAttendance() {
     await page.waitForSelector('input[id="hrone-username"]', { visible: true },
     { timeout: 240000 });
     console.log("Page loaded.");
-
+      // Wait for the Next button to appear
+      await page.waitForSelector('.loginform.btn.btn-success.btn-h-40', { visible: true },
+      { timeout: 240000 });
+      console.log("Next button loaded.");
     // Enter phone number and click "Next"
     await page.type('input[id="hrone-username"]', "6302257117");
     console.log("Phone number entered.");
-    await page.click(".loginform.btn.btn-login.btn-h-40");
+    await page.click(".loginform.btn.btn-success.btn-h-40");
     console.log("Next button clicked.");
 
     // Wait for the password input to become visible
@@ -107,13 +120,13 @@ async function markAttendance() {
     console.log("Login button clicked.");
 
     console.log("Waiting for the button to appear in the DOM...");
-    await page.waitForXPath("//button[contains(., 'MARK ATTENDANCE')]", {
+    await page.waitForXPath("//button[contains(., ' Mark attendance ')]", {
       timeout: 240000,
     });
     console.log("Button appeared in the DOM.");
 
     console.log("Selecting the button...");
-    const [button] = await page.$x("//button[contains(., 'MARK ATTENDANCE')]");
+    const [button] = await page.$x("//button[contains(., ' Mark attendance ')]");
     if (button) {
       const buttonHTML = await page.evaluate((el) => el.outerHTML, button);
       console.log("Button HTML:", buttonHTML);
@@ -125,14 +138,13 @@ async function markAttendance() {
     }
 
     // Wait for the remarks textarea to appear and enter remarks
-    await page.waitForSelector('textarea[name="webCheckinRemarkName"]', {
+    await page.waitForSelector('textarea[id="mat-input-18"]', {
       timeout: 240000,
     });
     
     console.log("Remarks textarea visible.");
-    await page.type('textarea[name="webCheckinRemarkName"]', "Punch");
+    await page.type('textarea[id="mat-input-18"]', "Punch");
     console.log("Remarks entered.");
-    await page.waitForTimeout(100000);
 
     // Wait for the final mark button to appear
     console.log("Waiting for the final mark button to appear in the DOM...");
@@ -154,10 +166,7 @@ async function markAttendance() {
       );
       console.log("Button HTML:", finalMarkButtonHTML);
       console.log("Button selected, clicking the button...");
-      await page.evaluate(() => {
-        let button = document.querySelector('.btn.btn-success.btn-h-40.btn-block.ladda-button');
-        button.click();
-      });
+      await page.evaluate((button) => button.click(), finalMarkButton);
       console.log("Button clicked.");
     } else {
       console.log("Could not find the button.");
@@ -165,18 +174,17 @@ async function markAttendance() {
 
     // Wait for the attendance to be marked
     // Wait for the remarks textarea to disappear
-    await page.waitForTimeout(100000);
-    await page.waitForSelector('textarea[name="webCheckinRemarkName"]', {
+    await page.waitForSelector('textarea[id="mat-input-18"]', {
       hidden: true,
       timeout: 240000,
     });
     console.log("Remarks textarea disappeared.");
-    console.log("Attendance marked successfully.");
+    console.log("Attendance marked successfully on", indiaTime, "----------------------------------->");
 
     // Close the browser
   } catch (e) {
-    console.error(e);
-    res.send(`Something went wrong while running Puppeteer: ${e}`);
+    console.log(e);
+    throw e;
   } finally {
     if (browser !== null) {
       await browser.close();
