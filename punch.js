@@ -5,7 +5,7 @@ require("dotenv").config();
 const DATES_MAY = [20, 21];
 const DATES_JUNE = [10, 11, 17, 18, 25];
 const DATES_JULY = [2, 8, 9, 15, 16, 23, 29, 30];
-const DATES_OCTOBER = [29,];
+const DATES_OCTOBER = [28,29];
 const DATES_NOVEMBER = [5, 11,12,18, 19, 26,27];
 const DATES_DECEMBER = [3, 9, 10, 16, 17, 24, 31];
 
