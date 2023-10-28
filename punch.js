@@ -81,7 +81,7 @@ async function markAttendance() {
       { timeout: 240000 });
       console.log("Next button loaded.");
     // Enter phone number and click "Next"
-    await page.type('input[id="hrone-username"]', "6302257117");
+    await page.type('input[id="hrone-username"]', "***********");
     console.log("Phone number entered.");
     await page.click(".loginform.btn.btn-success.btn-h-40");
     console.log("Next button clicked.");
