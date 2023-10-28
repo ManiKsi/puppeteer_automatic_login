@@ -69,7 +69,7 @@ async function markAttendance() {
     console.log("New page opened.");
 
     // Navigate to the website
-    await page.goto("https://app.hrone.cloud/login");
+    await page.goto("**********");
     console.log("Website opened successfully.");
 
     // Wait for the page to load
